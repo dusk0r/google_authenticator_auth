@@ -2,7 +2,7 @@ require 'rake'
 
 spec = Gem::Specification.new do |s|
   s.name = "google_authenticator_auth"
-  s.version = "1.0.1"
+  s.version = "1.1.0"
   s.author = "David Ricciardi"
   s.email = "nricciar@gmail.com"
   s.homepage = "http://github.com/nricciar/google_authenticator_auth"
@@ -20,6 +20,4 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'test-unit'
   s.add_development_dependency 'rdoc'
-  s.add_development_dependency(RUBY_VERSION =~ /^1\.9/ ? "simplecov" : "rcov")
-  s.add_development_dependency 'activesupport'
 end

@@ -12,26 +12,32 @@ class GoogleAuthenticatorAuthTest < Test::Unit::TestCase
  
   test "should use provided secret key" do
     ga = GoogleAuthenticator.new('NINWS2QUIQD2LA2Z')
-    assert_equal ga.secret_key, 'NINWS2QUIQD2LA2Z'
+    assert_equal 'NINWS2QUIQD2LA2Z', ga.secret_key
   end
 
   test "should return three keys" do
     ga = GoogleAuthenticator.new
-    assert_equal ga.get_keys.length, 3
+    assert_equal 3, ga.get_keys.length
   end 
 
   test "should return a valid qrcode url" do
     ga = GoogleAuthenticator.new('NINWS2QUIQD2LA2Z')
     
-    assert_equal ga.qrcode_url("user@domain.com"), "otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z"
-	assert_equal ga.qrcode_url("test label"), "otpauth://totp/test%20label?secret=NINWS2QUIQD2LA2Z"
+    assert_equal "otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z", ga.qrcode_url("user@domain.com")
+	assert_equal "otpauth://totp/test%20label?secret=NINWS2QUIQD2LA2Z", ga.qrcode_url("test label")
+  end
+  
+  test "should return a valid qrcode url with issuer" do
+    ga = GoogleAuthenticator.new('NINWS2QUIQD2LA2Z', 'peter&peter.com')
+    
+    assert_equal "otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z&issuer=peter%26peter.com", ga.qrcode_url("user@domain.com")
   end
   
   test "should return a valid google charts url" do
 	ga = GoogleAuthenticator.new('NINWS2QUIQD2LA2Z')
 	
-	assert_equal ga.qrcode_image_url("user@domain.com"), "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z"
-	assert_equal ga.qrcode_image_url("test label"), "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth://totp/test%2520label?secret=NINWS2QUIQD2LA2Z"
+	assert_equal "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth%3A%2F%2Ftotp%2Fuser%40domain.com%3Fsecret%3DNINWS2QUIQD2LA2Z", ga.qrcode_image_url("user@domain.com")
+	assert_equal "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth%3A%2F%2Ftotp%2Ftest%2520label%3Fsecret%3DNINWS2QUIQD2LA2Z", ga.qrcode_image_url("test label")
   end
 
   test "returned keys should be valid" do
@@ -52,9 +58,9 @@ class GoogleAuthenticatorAuthTest < Test::Unit::TestCase
 		2000000000 => '279037'
 	}
 	
-	testvectors.each do |t, k|
-		Timecop.freeze(baseTime + t) do
-			assert ga.key_valid?(k)
+	testvectors.each do |timeOffset, code|
+		Timecop.freeze(baseTime + timeOffset) do
+			assert ga.key_valid?(code)
 		end
 	end
   end
@@ -71,9 +77,9 @@ class GoogleAuthenticatorAuthTest < Test::Unit::TestCase
 		1111111111 + 60 => false
 	}
 	
-	testdata.each do |t, e|
-		Timecop.freeze(baseTime + t) do
-			assert (ga.key_valid?('050471') == e)
+	testdata.each do |timeOffset, expected|
+		Timecop.freeze(baseTime + timeOffset) do
+			assert_equal expected, ga.key_valid?('050471')
 		end
 	end
   end

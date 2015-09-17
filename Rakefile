@@ -4,7 +4,6 @@ require 'rdoc/task'
 require 'bundler'
 require 'simplecov'
 
-
 Bundler::GemHelper.install_tasks
 
 Rake::TestTask.new(:test) do |test|

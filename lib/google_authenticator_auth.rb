@@ -9,23 +9,16 @@
 require 'rubygems'
 require 'base32'
 require 'openssl'
-require 'uri'
-
-if RUBY_VERSION >= '1.8.7'
-	require 'securerandom'
-else
-	$stderr.puts 'google_authenticator_auth  Warning: Using rand(). This function is not suitable for cryptographic applications.'
-	class SecureRandom  
-		def self.random_number(val) rand(val)  end 
-	end
-end
+require 'erb'
+require 'securerandom'
 
 class GoogleAuthenticator
 
   # Load class with the provided secret key.  If no key is
   # provided generate a new random secret key
-  def initialize(key=nil)
+  def initialize(key=nil, issuer=nil)
     @secret_key = key.nil? ? GoogleAuthenticator.generate_secret_key : key
+	@issuer = issuer
   end
 
   # Generate a unique secret key
@@ -36,13 +29,17 @@ class GoogleAuthenticator
   # Google Charts image URL (resulting image can be scanned by
   # the Google Authenticator app to automaticly import secret key
   def qrcode_image_url(label,wh=350)
-    "https://chart.googleapis.com/chart?chs=#{wh}x#{wh}&cht=qr&choe=UTF-8&chl=" + uri_parser.escape(qrcode_url(label))
+    "https://chart.googleapis.com/chart?chs=#{wh}x#{wh}&cht=qr&choe=UTF-8&chl=" + CGI::escape(qrcode_url(label))
   end
 
   # QRCode URL used to generate a QRCode that can be scanned into
   # Google Authenticator (see qrcode_image_url)
   def qrcode_url(label)
-    "otpauth://totp/#{uri_parser.escape(label)}?secret=#{@secret_key}"
+	if @issuer
+		"otpauth://totp/#{ERB::Util.url_encode(label).gsub('%40', '@')}?secret=#{@secret_key}&issuer=#{ERB::Util.url_encode(@issuer)}"
+	else
+		"otpauth://totp/#{ERB::Util.url_encode(label).gsub('%40', '@')}?secret=#{@secret_key}"
+	end
   end
 
   # Current secret key
@@ -84,11 +81,6 @@ class GoogleAuthenticator
     end
 
     keys
-  end
-
-  protected
-  def uri_parser
-    @uri_parser ||= URI.const_defined?(:Parser) ? URI::Parser.new : URI
   end
 
 end
