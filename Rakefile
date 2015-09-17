@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
 require 'bundler'
-require 'simplecov'
+#require 'simplecov'
 
 Bundler::GemHelper.install_tasks
 
