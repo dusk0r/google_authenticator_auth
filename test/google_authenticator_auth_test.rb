@@ -1,7 +1,8 @@
 # encoding: utf-8
-require File.expand_path(File.join(File.dirname(__FILE__),'test_helper'))
+require 'test/unit'
+require_relative '../lib/google_authenticator_auth.rb'
 
-class GoogleAuthenticatorAuthTest < ActiveSupport::TestCase
+class GoogleAuthenticatorAuthTest < Test::Unit::TestCase
 
   test "should create a random key when started with no paramaters" do
     ga = GoogleAuthenticator.new
