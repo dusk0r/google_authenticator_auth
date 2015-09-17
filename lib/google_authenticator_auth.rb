@@ -42,7 +42,7 @@ class GoogleAuthenticator
   # QRCode URL used to generate a QRCode that can be scanned into
   # Google Authenticator (see qrcode_image_url)
   def qrcode_url(label)
-    "otpauth://totp/#{label}?secret=#{@secret_key}"
+    "otpauth://totp/#{uri_parser.escape(label)}?secret=#{@secret_key}"
   end
 
   # Current secret key

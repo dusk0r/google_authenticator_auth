@@ -22,8 +22,16 @@ class GoogleAuthenticatorAuthTest < Test::Unit::TestCase
 
   test "should return a valid qrcode url" do
     ga = GoogleAuthenticator.new('NINWS2QUIQD2LA2Z')
-    assert_equal ga.qrcode_image_url("user@domain.com"), "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z"
+    
     assert_equal ga.qrcode_url("user@domain.com"), "otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z"
+	assert_equal ga.qrcode_url("test label"), "otpauth://totp/test%20label?secret=NINWS2QUIQD2LA2Z"
+  end
+  
+  test "should return a valid google charts url" do
+	ga = GoogleAuthenticator.new('NINWS2QUIQD2LA2Z')
+	
+	assert_equal ga.qrcode_image_url("user@domain.com"), "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth://totp/user@domain.com?secret=NINWS2QUIQD2LA2Z"
+	assert_equal ga.qrcode_image_url("test label"), "https://chart.googleapis.com/chart?chs=350x350&cht=qr&choe=UTF-8&chl=otpauth://totp/test%2520label?secret=NINWS2QUIQD2LA2Z"
   end
 
   test "returned keys should be valid" do
