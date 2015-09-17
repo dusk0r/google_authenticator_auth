@@ -61,7 +61,7 @@ class GoogleAuthenticator
   def get_keys
     keys = []
     int = 30
-    now = Time.now.to_i / int
+    now = Time.now.utc.to_i / int
     key = Base32.decode @secret_key
     sha = OpenSSL::Digest::Digest.new('sha1')
 
